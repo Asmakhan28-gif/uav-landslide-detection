@@ -1,36 +1,57 @@
 # LSDM: Landslide Detection Model
 
-This repository contains the implementation of LSDM (Landslide Detection Model), an efficient end-to-end framework for UAV-based landslide detection using enhanced YOLOv8s architecture with Spatial Pyramid Dilated Convolution (SPD-Conv) and Spatial Path Aggregation Network (SPANet).
+This repository contains the implementation of **LSDM (Landslide Detection Model)** — an efficient end-to-end framework for UAV-based landslide detection using an enhanced YOLOv8s architecture with **Spatial Pyramid Dilated Convolution (SPD-Conv)** and **Spatial Path Aggregation Network (SPANet)**.
 
-## Features
+---
 
-- **Enhanced YOLOv8s Architecture**: Modified backbone with SPD-Conv modules for better small object detection
-- **SPD-Conv Module**: Space-to-depth convolution that preserves fine-grained features while reducing information loss
-- **SPANet**: Enhanced feature fusion network with shallow feature integration (P2 layer)
-- **Real-time Performance**: Optimized for UAV deployment and edge devices
-- **Lightweight Design**: ~11M parameters for efficient inference
+## 🚀 Features
 
-## Model Architecture
+- 🔍 **Enhanced YOLOv8s Architecture** with SPD-Conv backbone
+- 🧠 **SPD-Conv Module**: Preserves fine-grained spatial features
+- 🕸️ **SPANet**: Shallow-deep feature fusion via P2-P4 layers
+- ⚡ **Real-time Inference**: Optimized for UAV and edge devices
+- 📦 **Lightweight**: ~11M parameters, efficient on GPU/CPU
+
+---
+
+## 🏗️ Model Architecture
 
 ### Key Components
 
 1. **SPD-Conv Module** (`spd_conv.py`):
-   - Replaces traditional strided convolutions
-   - Uses space-to-depth transformation to preserve spatial information
-   - Maintains discriminative features for small landslide detection
+   - Replaces strided convolutions
+   - Uses space-to-depth transformation
+   - Retains high-resolution features for small landslide detection
 
 2. **SPANet** (`spanet.py`):
    - Enhanced Path Aggregation Network
-   - Integrates shallow P2 features for better multi-scale fusion
-   - Improves contextual awareness across diverse terrains
+   - Combines shallow P2 and deeper P3/P4 layers
+   - Improves context awareness across terrain scales
 
 3. **LSDM Model** (`lsdm_model.py`):
-   - Complete end-to-end framework
-   - Enhanced YOLOv8s backbone with SPD-Conv integration
-   - SPANet neck for improved feature fusion
-   - YOLOv8 detection head with DFL (Distribution Focal Loss)
+   - YOLOv8-inspired end-to-end detection model
+   - Combines SPD-Conv + SPANet + DFL detection head
 
-## Installation
+---
+
+## ⚠️ Implementation Notice
+
+> **Important Note:**  
+> This repository includes placeholder logic in some components to demonstrate the architecture. These include:
+
+- 🔧 **Loss Function**: The current `YOLOLoss` class is a simplified placeholder and **does not implement full YOLO-style loss** (no CIoU/DFL/objectness).
+- 🔍 **Inference Postprocessing**: The `inference_script.py` uses **dummy bounding box coordinates** (randomly generated) instead of actual box decoding + NMS.
+
+✅ The **LSDM architecture itself is fully implemented and trainable**, and this repo serves as a **baseline** for researchers to build upon.
+
+📌 For practical deployment or evaluation, users should:
+- Implement proper loss functions with target assignment
+- Decode predicted boxes and apply Non-Maximum Suppression (NMS)
+- Evaluate with mAP, IoU, recall, etc.
+
+---
+
+## ⚙️ Installation
 
 ```bash
 # Clone the repository
@@ -41,158 +62,150 @@ cd LSDM-Landslide-Detection
 pip install -r requirements.txt
 ```
 
-## Dataset Format
+---
 
-The model expects YOLO format annotations:
+## 📁 Dataset Format
+
+The model expects **YOLO format annotations**:
 
 ```
 dataset/
 ├── images/
 │   ├── train/
-│   │   ├── img1.jpg
-│   │   ├── img2.jpg
-│   │   └── ...
 │   └── val/
-│       ├── val1.jpg
-│       └── ...
 └── labels/
     ├── train/
-    │   ├── img1.txt
-    │   ├── img2.txt
-    │   └── ...
     └── val/
-        ├── val1.txt
-        └── ...
 ```
 
-Label format (YOLO): `class_id x_center y_center width height` (normalized coordinates)
+Each label file (`.txt`) contains:
+```
+class_id x_center y_center width height
+```
+(normalized coordinates)
 
-## Training
+---
+
+## 🏋️ Training
 
 ```bash
-python train.py \
-    --train-images ./dataset/images/train \
-    --train-labels ./dataset/labels/train \
-    --val-images ./dataset/images/val \
-    --val-labels ./dataset/labels/val \
-    --epochs 150 \
-    --batch-size 16 \
-    --img-size 640 \
-    --output-dir ./runs/train
+python train_lsdm.py   --train-images ./dataset/images/train   --train-labels ./dataset/labels/train   --val-images ./dataset/images/val   --val-labels ./dataset/labels/val   --epochs 150   --batch-size 16   --img-size 640   --output-dir ./runs/train
 ```
 
 ### Training Parameters
 
-- `--epochs`: Number of training epochs (default: 150)
-- `--batch-size`: Batch size (default: 16)
-- `--lr`: Learning rate (default: 0.001)
-- `--img-size`: Input image size (default: 640)
-- `--num-classes`: Number of classes (default: 1 for landslide)
+| Argument       | Description                      | Default |
+|----------------|----------------------------------|---------|
+| `--epochs`     | Number of training epochs        | 150     |
+| `--batch-size` | Batch size                       | 16      |
+| `--img-size`   | Input image size                 | 640     |
+| `--num-classes`| Number of object classes         | 1       |
 
-## Inference
+---
 
-### Single Image
+## 🔎 Inference
 
-```bash
-python inference.py \
-    --model ./runs/train/best_model.pth \
-    --source ./test_image.jpg \
-    --output ./runs/inference \
-    --conf-thresh 0.25
-```
-
-### Directory of Images
+### For a Single Image
 
 ```bash
-python inference.py \
-    --model ./runs/train/best_model.pth \
-    --source ./test_images/ \
-    --output ./runs/inference \
-    --conf-thresh 0.25
+python inference_script.py   --model ./runs/train/best_model.pth   --source ./test_image.jpg   --output ./runs/inference   --conf-thresh 0.25
 ```
 
+### For a Folder of Images
 
-## Usage Examples
+```bash
+python inference_script.py   --model ./runs/train/best_model.pth   --source ./test_images/   --output ./runs/inference   --conf-thresh 0.25
+```
 
-### Quick Test
+---
+
+## 🧪 Usage Examples
+
+### Quick Model Test
 
 ```python
 from lsdm_model import create_lsdm_model
 import torch
 
-# Create model
 model = create_lsdm_model(num_classes=1)
-
-# Test forward pass
 x = torch.randn(1, 3, 640, 640)
 predictions = model(x)
 
-print(f"Model loaded successfully!")
-print(f"Prediction shapes: {[p.shape for p in predictions]}")
+print("Prediction shapes:", [p.shape for p in predictions])
 ```
 
-### Custom Training Loop
+### Custom Training Setup
 
 ```python
 from lsdm_model import create_lsdm_model
-from train import LandslideDataset, YOLOLoss
-import torch
+from train_lsdm import LandslideDataset, YOLOLoss
 
-# Initialize model, dataset, and loss
 model = create_lsdm_model(num_classes=1)
 dataset = LandslideDataset('./images', './labels')
 criterion = YOLOLoss(num_classes=1)
-
-# Your training loop here...
 ```
 
+---
 
-
-## Requirements
+## 📦 Requirements
 
 - Python 3.7+
 - PyTorch 1.11.0+
 - OpenCV 4.5.0+
 - NumPy 1.21.0+
-- See `requirements.txt` for full dependencies
+- See `requirements.txt` for complete list
 
-## Hardware Requirements
+---
 
-- **Training**: NVIDIA GPU with 8GB+ VRAM recommended
-- **Inference**: CPU or GPU (optimized for edge devices)
-- **Memory**: 4GB+ RAM for training, 2GB+ for inference
+## 🖥️ Hardware Requirements
 
-## Contributing
+| Task       | Recommendation                     |
+|------------|------------------------------------|
+| Training   | NVIDIA GPU (8GB+ VRAM)             |
+| Inference  | CPU or GPU (Optimized for edge AI) |
+| RAM        | 4GB+ for training, 2GB+ for inference |
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+---
 
-## License
+## 🤝 Contributing
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+1. Fork the repo
+2. Create a branch (`git checkout -b feature/XYZ`)
+3. Commit your changes
+4. Push and create a pull request
 
-## Acknowledgments
+---
 
-- Based on YOLOv8 architecture by Ultralytics
-- SPD-Conv implementation inspired by the original paper
-- Dataset collected using DJI Mavic Air 2 in California landslide-prone regions
+## 📄 License
 
+This project is licensed under the **MIT License** — see the [LICENSE](./LICENSE) file for details.
 
+---
 
-## Troubleshooting
+## 🙏 Acknowledgments
+
+- Architecture inspired by **YOLOv8 (Ultralytics)**
+- SPD-Conv design based on academic literature
+- UAV dataset collected using **DJI Mavic Air 2** in landslide-prone regions
+
+---
+
+## 🛠 Troubleshooting
 
 ### Common Issues
 
-1. **CUDA Out of Memory**: Reduce batch size or image size
-2. **Model Loading Error**: Ensure model path is correct and model file exists
-3. **Dataset Loading**: Check image and label paths match expected format
+| Problem                     | Solution                                  |
+|----------------------------|-------------------------------------------|
+| CUDA Out of Memory         | Reduce batch size or image resolution     |
+| Dataset not loading        | Check folder paths and label formatting   |
+| Model checkpoint not found | Verify path to `.pth` file in inference   |
 
-### Performance Tips
+---
 
-1. Use GPU for training and inference when available
-2. Adjust batch size based on available memory
-3. Use mixed precision training for faster convergence
-4. Consider data augmentation for better generalization
+## 💡 Performance Tips
+
+- Use GPU + mixed precision (`torch.cuda.amp`) for faster training
+- Add data augmentation (Albumentations) to generalize better
+- Evaluate using mAP50/mAP50-95 for best model selection
+
+---
