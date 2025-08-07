@@ -191,11 +191,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - SPD-Conv implementation inspired by the original paper
 - Dataset collected using DJI Mavic Air 2 in California landslide-prone regions
 
-## Contact
 
-- **Asma Khan**: asmakhan28@sju.ac.kr
-- **Kashif Nasr**: kashif.nasr@ucp.edu.pk  
-- **Samee Ullah Khan**: samee.khan@ku.ac.ae
 
 ## Troubleshooting
 
