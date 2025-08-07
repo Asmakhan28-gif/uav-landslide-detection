@@ -1,0 +1,117 @@
+# LSDM Configuration File
+# Landslide Detection Model Settings
+
+# Model Configuration
+model:
+  name: "LSDM"
+  num_classes: 1  # Landslide detection (single class)
+  input_channels: 3  # RGB images
+  img_size: 640  # Input image size
+  
+# Dataset Configuration
+dataset:
+  train_images: "./dataset/images/train"
+  train_labels: "./dataset/labels/train"
+  val_images: "./dataset/images/val"
+  val_labels: "./dataset/labels/val"
+  test_images: "./dataset/images/test"
+  
+# Training Configuration
+train:
+  epochs: 150
+  batch_size: 16
+  learning_rate: 0.001
+  weight_decay: 0.0005
+  warmup_epochs: 5
+  workers: 4
+  
+  # Optimizer settings
+  optimizer: "AdamW"  # Options: AdamW, SGD, Adam
+  momentum: 0.9  # For SGD
+  
+  # Scheduler settings
+  scheduler: "CosineAnnealingLR"
+  min_lr: 0.00001
+  
+  # Loss weights
+  box_loss_weight: 1.0
+  cls_loss_weight: 1.0
+  obj_loss_weight: 1.0
+
+# Augmentation Configuration
+augmentation:
+  enabled: true
+  horizontal_flip: 0.5
+  vertical_flip: 0.2
+  rotation: 20  # degrees
+  brightness: 0.2
+  contrast: 0.2
+  saturation: 0.2
+  hue: 0.1
+  motion_blur: true
+  gaussian_noise: 0.02
+
+# Model Architecture Configuration
+architecture:
+  backbone:
+    base_channels: 64
+    spd_conv_layers: [3, 6, 9, 12]  # Layers to replace with SPD-Conv
+    spd_conv_scale: 2
+  
+  neck:
+    spanet_enabled: true
+    feature_channels: [256, 512, 1024]  # P2, P3, P4 channels
+  
+  head:
+    reg_max: 16  # DFL regression max
+    conf_thresh: 0.25
+    iou_thresh: 0.45
+    max_det: 300
+
+# Inference Configuration
+inference:
+  conf_thresh: 0.25
+  iou_thresh: 0.45
+  max_det: 300
+  agnostic_nms: false
+  multi_label: false
+  
+# Export Configuration
+export:
+  formats: ["pytorch", "onnx", "torchscript"]
+  onnx_dynamic: true
+  simplify_onnx: true
+  
+# Logging Configuration
+logging:
+  log_level: "INFO"
+  save_dir: "./runs"
+  project_name: "LSDM_landslide_detection"
+  experiment_name: "exp"
+  
+  # Visualization
+  visualize_predictions: true
+  save_train_images: false
+  save_val_images: true
+  
+# Hardware Configuration
+hardware:
+  device: "auto"  # auto, cpu, cuda, cuda:0, etc.
+  mixed_precision: true
+  compile_model: false  # PyTorch 2.0 compile
+  
+# Validation Configuration
+validation:
+  val_freq: 5  # Validate every N epochs
+  save_best: true
+  metric: "mAP50"  # Metric to track for best model
+  
+# Early Stopping
+early_stopping:
+  enabled: false
+  patience: 20
+  min_delta: 0.001
+
+# Class Names
+names:
+  0: "landslide"
