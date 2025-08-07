@@ -146,18 +146,7 @@ criterion = YOLOLoss(num_classes=1)
 # Your training loop here...
 ```
 
-## Citation
 
-If you use this code in your research, please cite:
-
-```bibtex
-@article{khan2025lsdm,
-  title={UAV-Based Landslide Detection Using Context-Aware Framework for Complex Terrain Mapping},
-  author={Khan, Asma and Nasr, Kashif and Khan, Samee Ullah},
-  journal={Submitted to Elsevier},
-  year={2025}
-}
-```
 
 ## Requirements
 
